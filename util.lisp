@@ -9,6 +9,7 @@
 
 ;; TODO: substitute _ for -
 (defun to-keyword (thing)
+  "convert THING to keyword"
   (intern (string-upcase thing)
           :keyword))
 
@@ -34,6 +35,7 @@
   (vec* v1 (vec2 n n)))
 
 (defun move-fist (dir)
+  "move the fist in a direction"
   (let ((pos (sprite-pos *fist*)))
     (setf (sprite-pos *fist*)
           (case dir
@@ -43,6 +45,7 @@
                           (y pos)))))))
 
 (defmacro l (&body body)
+  "shorthand way to write lambdas. accepts two arguments _ and __"
   `(lambda (&optional _ __)
      (declare (ignorable _ __))
      ,@body))
