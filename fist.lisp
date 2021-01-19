@@ -8,7 +8,6 @@
 (defvar *origin* (vec2 0 0))
 (defvar *black* (vec4 0 0 0 1))
 
-(defvar *boosting* nil)
 (defparameter *speed* 20)
 
 (gamekit:register-resource-package
@@ -24,17 +23,19 @@
 
 (defvar *fist*
   (define-sprite "fist.png"
-                 :pos (vec/ (vec2 *width* *height*) 2)
-                 :center (vec2 18 36)))
+    :pos (vec/ (vec2 *width* *height*) 2)
+    :center (vec2 18 36)
+    :render t))
 
 (defvar *flame*
   (define-spritesheet "flame.png" :frames 2 :frame-length 30
-    :sprite-size (vec2 20 20) :center (vec2 10 10)))
+    :sprite-size (vec2 20 20) :center (vec2 10 10)
+    :render nil :animate t))
 
-(defvar *moon*
-  (define-sprite "moon.png"
-                 :pos (vec2 (/ *width* 2) *height*)
-                 :center (vec2 50 50)))
+(define-sprite "moon.png"
+  :pos (vec2 (/ *width* 2) *height*)
+  :center (vec2 50 50)
+  :render t)
 
 (defmethod gamekit:draw ((s sprite))
   (let ((size (sprite-size s))
@@ -56,22 +57,6 @@
                         :width (x size)
                         :height (y size))))
 
-(defmethod gamekit:act ((app game))
-  (let ((tick (spritesheet-tick *flame*))
-        (length (spritesheet-frame-length *flame*))
-        (frame (spritesheet-current-frame *flame*))
-        (max-frames (spritesheet-frames *flame*)))
-    (setf (spritesheet-pos *flame*)
-          (vec- (sprite-pos *fist*)
-                (vec2 5 46))
-      
-          (spritesheet-tick *flame*)
-          (mod (1+ tick) length))
-
-    (when (zerop (spritesheet-tick *flame*))
-      (setf (spritesheet-current-frame *flame*)
-            (mod (1+ frame) max-frames)))))
-
 (gamekit:bind-button :right :pressed
                      (l (move-fist :right)))
 (gamekit:bind-button :left :pressed
@@ -84,7 +69,19 @@
 
 (defmethod gamekit:draw ((app game))
   (gamekit:draw-rect *origin* *width* *height* :fill-paint *black*)
-  (gamekit:draw *fist*)
-  (gamekit:Draw *moon*)
-  (when *boosting*
-    (gamekit:Draw *flame*)))
+
+  (loop for s in *sprites*
+        when (sprite-render s) do
+          (gamekit:draw s))
+  (loop for s in *spritesheets*
+        when (spritesheet-render s) do
+          (gamekit:draw s)))
+
+(defmethod gamekit:act ((app game))
+  ;; handle spritesheet animation
+  (loop for s in *spritesheets*
+        when (spritesheet-animate s) do
+          (animate-spritesheet s))
+  (setf (spritesheet-pos *flame*)
+        (vec- (sprite-pos *fist*)
+              (vec2 5 46))))
