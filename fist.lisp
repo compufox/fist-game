@@ -24,15 +24,12 @@
 
 (defvar *fist*
   (define-sprite "fist.png"
-                 :pos (vec2 (/ *width* 2)
-                            (/ *height* 2))
+                 :pos (vec/ (vec2 *width* *height*) 2)
                  :center (vec2 18 36)))
 
-(defvar *flame1*
-  (define-sprite "flame1.png"))
-
-(defvar *flame2*
-  (define-sprite "flame2.png"))
+(defvar *flame*
+  (define-spritesheet "flame.png" :frames 2 :frame-length 30
+    :sprite-size (vec2 20 20) :center (vec2 10 10)))
 
 (defvar *moon*
   (define-sprite "moon.png"
@@ -43,16 +40,37 @@
   (let ((size (sprite-size s))
         (pos (sprite-pos s))
         (center (sprite-center s)))
-    (gamekit:draw-image (vec2 (- (x pos) (x center))
-                              (- (y pos) (y center)))
+    (gamekit:draw-image (vec- pos center)
                         (sprite-image s)
                         :width (x size)
                         :height (y size))))
 
+(defmethod gamekit:draw ((s spritesheet))
+  (let ((frame (spritesheet-current-frame s))
+        (size (spritesheet-sprite-size s))
+        (pos (spritesheet-pos s))
+        (center (spritesheet-center s)))
+    (gamekit:draw-image (vec- pos center)
+                        (spritesheet-image s)
+                        :origin (vec2 (* frame (x size)) 0)
+                        :width (x size)
+                        :height (y size))))
+
 (defmethod gamekit:act ((app game))
-  (setf (sprite-pos *flame1*)
-        (vec- (sprite-pos *fist*)
-              (vec2 13 56))))
+  (let ((tick (spritesheet-tick *flame*))
+        (length (spritesheet-frame-length *flame*))
+        (frame (spritesheet-current-frame *flame*))
+        (max-frames (spritesheet-frames *flame*)))
+    (setf (spritesheet-pos *flame*)
+          (vec- (sprite-pos *fist*)
+                (vec2 5 46))
+      
+          (spritesheet-tick *flame*)
+          (mod (1+ tick) length))
+
+    (when (zerop (spritesheet-tick *flame*))
+      (setf (spritesheet-current-frame *flame*)
+            (mod (1+ frame) max-frames)))))
 
 (gamekit:bind-button :right :pressed
                      (l (move-fist :right)))
@@ -69,4 +87,4 @@
   (gamekit:draw *fist*)
   (gamekit:Draw *moon*)
   (when *boosting*
-    (gamekit:Draw *flame1*)))
+    (gamekit:Draw *flame*)))
