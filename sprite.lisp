@@ -63,9 +63,9 @@ ANIMATE is nil by default. if set to non-nil then the spritesheet will animate"
                            :animate ,animate
                            :render ,render
                            :frames ,frames
-                           :frame-size (or ,frame-size *origin*)
-                           :pos (or ,pos *origin*)
-                           :center (or ,center *origin*)
+                           :frame-size (or ,frame-size +origin+)
+                           :pos (or ,pos +origin+)
+                           :center (or ,center +origin+)
                            :frame-length ,frame-length)))
        (gamekit:define-image ,sprite-name ,path)
        (sleep 0.1)

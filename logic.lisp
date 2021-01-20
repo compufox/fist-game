@@ -5,7 +5,7 @@
   (let ((pos (sprite-pos *fist*)))
     (setf (sprite-pos *fist*)
           (case dir
-            (:right (vec2 (min *width* (+ (x pos) *speed*))
+            (:right (vec2 (min +width+ (+ (x pos) *speed*))
                           (y pos)))
             (:left (vec2 (max 0 (- (x pos) *speed*))
                          (y pos)))))))

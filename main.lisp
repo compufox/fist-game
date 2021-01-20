@@ -7,8 +7,8 @@
  (asdf:system-relative-pathname :fist "resources/"))
 
 (defgame game () ()
-  (:viewport-width *width*)
-  (:viewport-height *height*)
+  (:viewport-width +width+)
+  (:viewport-height +height+)
   (:viewport-title "fist"))
 
 (gamekit:start 'game)
@@ -17,7 +17,7 @@
 ;; DEFINE SPRITE/SHEET ASSETS
 (defvar *fist*
   (define-sprite "fist.png"
-    :pos (vec/ (vec2 *width* *height*) 2)
+    :pos (vec/ (vec2 +width+ +height+) 2)
     :center (vec2 18 36)
     :render t))
 
@@ -27,7 +27,7 @@
     :render nil :animate t))
 
 (define-sprite "moon.png"
-  :pos (vec2 (/ *width* 2) *height*)
+  :pos (vec2 (/ +width+ 2) +height+)
   :center (vec2 50 50)
   :render t)
 
@@ -52,7 +52,7 @@
 
 ;; main draw function
 (defmethod gamekit:draw ((app game))
-  (gamekit:draw-rect *origin* *width* *height* :fill-paint *black*)
+  (gamekit:draw-rect +origin+ +width+ +height+ :fill-paint +black+)
 
   (loop for s in *sprites*
         when (sprite-render s) do
