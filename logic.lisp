@@ -8,4 +8,9 @@
             (:right (vec2 (min *width* (+ (x pos) *speed*))
                           (y pos)))
             (:left (vec2 (max 0 (- (x pos) *speed*))
-                          (y pos)))))))
+                         (y pos)))))))
+
+(defun process ()
+  (setf (sprite-pos *flame*)
+        (vec- (sprite-pos *fist*)
+              (vec2 5 46))))

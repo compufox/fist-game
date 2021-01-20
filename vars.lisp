@@ -10,6 +10,5 @@
 ;; speed of sprite movement
 (defparameter *speed* 20)
 
-;; sprite/sheet holders
+;; list sprite holder
 (defvar *sprites* nil)
-(defvar *spritesheets* nil)

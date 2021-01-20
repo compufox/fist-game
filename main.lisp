@@ -22,8 +22,8 @@
     :render t))
 
 (defvar *flame*
-  (define-spritesheet "flame.png" :frames 2 :frame-length 30
-    :sprite-size (vec2 20 20) :center (vec2 10 10)
+  (define-sprite "flame.png" :frames 2 :frame-length 30
+    :frame-size (vec2 20 20) :center (vec2 10 10)
     :render nil :animate t))
 
 (define-sprite "moon.png"
@@ -40,8 +40,8 @@
                      (l (move-fist :left)))
 
 (gamekit:bind-button :space :pressed
-                     (l (setf (spritesheet-render *flame*)
-                              (not (spritesheet-render *flame*)))))
+                     (l (setf (sprite-render *flame*)
+                              (not (sprite-render *flame*)))))
 
 (gamekit:bind-button :right :repeating
                      (l (move-fist :right)))
@@ -56,17 +56,13 @@
 
   (loop for s in *sprites*
         when (sprite-render s) do
-          (gamekit:draw s))
-  (loop for s in *spritesheets*
-        when (spritesheet-render s) do
           (gamekit:draw s)))
 
 ;; main process function
 (defmethod gamekit:act ((app game))
   ;; handle spritesheet animation
-  (loop for s in *spritesheets*
-        when (spritesheet-animate s) do
-          (animate-spritesheet s))
-  (setf (spritesheet-pos *flame*)
-        (vec- (sprite-pos *fist*)
-              (vec2 5 46))))
+  (loop for s in *sprites*
+        when (sprite-animate s) do
+          (animate-sprite s))
+
+  (process))
