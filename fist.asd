@@ -8,8 +8,8 @@
   :serial t
   :depends-on (#:trivial-gamekit)
   :components ((:file "package")
-               (:file "vars")
                (:file "util")
+               (:file "vars")
                (:file "sprite")
                (:file "logic")
                (:file "main")))

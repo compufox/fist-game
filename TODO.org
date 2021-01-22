@@ -13,3 +13,11 @@
 - alien
 - meteors
 - backgrounds
+
+** Code
+
+*** Player screenwrap
+    would be neat if the player wrapped around the screen
+
+*** Collision 
+    still kinda fucky, not detecting properly
