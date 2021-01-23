@@ -19,6 +19,12 @@
 (gamekit:start 'game)
 
 ;;;
+;; DEFINE FONTS
+(define-fonts "KronaOne-Regular.ttf" :krona
+  (*large-font* 50)
+  (*small-font* 20))
+
+;;;
 ;; DEFINE SPRITE/SHEET ASSETS
 (defvar *fist*
   (define-sprite "fist.png"
@@ -98,9 +104,14 @@
 (defmethod gamekit:draw ((app game))
   (gamekit:draw-rect +origin+ +width+ +height+ :fill-paint +black+)
 
+  ;; draw-text needs to be inside draw function
+  ;;(gamekit:draw-text "START" (vec2 100 100) :font *large-font* :fill-color (vec4 1 1 1 1))
+  
   (loop for s in *sprites*
         when (sprite-render s) do
-          (gamekit:draw s)))
+          ;; when rotates/scales it changes the position on the main canvas.
+          ;; determine how to fix that.
+          (gamekit:with-pushed-canvas () (gamekit:draw s))))
 
 ;; main process function
 (defmethod gamekit:act ((app game))

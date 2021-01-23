@@ -77,3 +77,10 @@
          (and (>= (y pos1) (y pos2))
               (<= (+ (y pos1) (y bb1))
                   (+ (y pos2) (y bb2)))))))
+
+(defmacro define-fonts (font name &rest forms)
+  `(progn
+     (gamekit:define-font ,name ,font)
+     ,@(loop for f in forms
+             collect `(defvar ,(car f)
+                        (gamekit:make-font ,name ,(cadr f))))))

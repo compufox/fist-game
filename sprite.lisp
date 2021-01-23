@@ -5,6 +5,8 @@
   (tick 0)
   (current-frame 0)
   (vel +origin+)
+  (rotation 0)
+  (scale (vec2 1 1))
   image frames frame-size animate
   frame-length pos center render 
   bounding collision-group collide-with
@@ -40,6 +42,8 @@
                             :collision-group (sprite-collision-group sprite)
                             :collide-with (sprite-collide-with sprite)
                             :pos (sprite-pos sprite)
+                            :scale (sprite-scale sprite)
+                            :rotation (sprite-rotation sprite)
                             :center (sprite-center sprite)
                             :render (sprite-render sprite)
                             :animate (sprite-animate sprite))))
@@ -53,7 +57,7 @@
         unless (sprite-render s)
           return s))
 
-(defmacro define-sprite (path &key name (frames 0) (frame-length 0) frame-size pos center bounding collision-group collide-with render animate collision)
+(defmacro define-sprite (path &key name (frames 0) (frame-length 0) frame-size pos center bounding collision-group collide-with render animate collision scale rotation)
   "defines a sprite at PATH, including how many FRAMES, how long each frame should last, how big each sprite is, the sprite's POSition, and CENTER.
 expects a spritesheet that has all sprites aligned along the X axis, and none aligned along the Y axis
 
@@ -70,6 +74,8 @@ ANIMATE is nil by default. if set to non-nil then the spritesheet will animate"
                            :frames ,frames
                            :bounding (or ,bounding ,frame-size +origin+)
                            :collision ,collision
+                           :scale (or ,scale (vec2 1 1))
+                           :rotation (or ,rotation 0)
                            :collision-group ,collision-group
                            :collide-with ,collide-with
                            :frame-size (or ,frame-size +origin+)
@@ -90,7 +96,11 @@ ANIMATE is nil by default. if set to non-nil then the spritesheet will animate"
   (let ((frame (sprite-current-frame s))
         (size (sprite-frame-size s))
         (pos (sprite-pos s))
-        (center (sprite-center s)))
+        (center (sprite-center s))
+        (scale (sprite-scale s))
+        (rot (sprite-rotation s)))
+    (gamekit:scale-canvas (x scale) (y scale))
+    (gamekit:rotate-canvas (/ (* rot 3.14159) 180))
     (gamekit:draw-image (vec- pos center)
                         (sprite-image s)
                         :origin (vec2 (* frame (x size)) 0)
