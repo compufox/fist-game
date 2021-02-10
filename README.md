@@ -1,9 +1,10 @@
 # fist
 ### _ava fox_
 
-This is a project to do ... something.
+Control a fist! Punch the moon!
 
 ## License
 
-Specify license here
-
+Code: GPLv3
+Assets (besides spaceship.wav): CC BY-NC 2.0
+spaceship.wav made by [mrpoly on opengameart](https://opengameart.org/content/space-music)
