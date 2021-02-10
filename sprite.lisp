@@ -57,6 +57,11 @@
         unless (sprite-render s)
           return s))
 
+(defun sprite-center-pos (s)
+  (let ((pos (sprite-pos s))
+        (center (sprite-center s)))
+    (vec+ pos center)))
+
 (defmacro define-sprite (path &key name (frames 0) (frame-length 0) frame-size pos center bounding collision-group collide-with render animate collision scale rotation)
   "defines a sprite at PATH, including how many FRAMES, how long each frame should last, how big each sprite is, the sprite's POSition, and CENTER.
 expects a spritesheet that has all sprites aligned along the X axis, and none aligned along the Y axis
@@ -106,3 +111,17 @@ ANIMATE is nil by default. if set to non-nil then the spritesheet will animate"
                         :origin (vec2 (* frame (x size)) 0)
                         :width (x size)
                         :height (y size))))
+
+(declaim (inline set-sprite-menu-position))
+(defun set-sprite-menu-position ()
+  (setf (sprite-pos *moon*) +moon-menu-pos+
+        (sprite-scale *moon*) (vec2 2 2)
+
+        (sprite-pos *fist*) +fist-menu-pos+
+        (sprite-scale *fist*) (vec2 2 2)
+
+        (sprite-pos *flame*) (vec- (vec2 (+ (x +fist-menu-pos+) 5)
+                                         (- (y +fist-menu-pos+)
+                                            (y (sprite-center *fist*))))
+                                   (sprite-center *flame*))
+        (sprite-scale *flame*) (vec2 2 2)))

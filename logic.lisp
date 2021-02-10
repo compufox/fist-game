@@ -2,7 +2,7 @@
 
 (declaim (inline move-sprite))
 
-(defun process-collision ()
+(defun process-collision (state)
   ;; every rendered sprite
   ;;  check if they have collision on
   ;;  get what group theyre in, and what groups they collide with
@@ -19,35 +19,39 @@
                      (when (and (member (sprite-collision-group s1)
                                         (sprite-collide-with s2))
                                 (sprites-overlap-p s1 s2))
-                       (format t "collided!"))))))
+                       (unless (failed state)
+                         (gamekit:play-sound :explosion1))
+                       (setf (failed state) t))))))
 
 (defun move-sprite (s)
   (setf (sprite-pos s)
         (vec+ (sprite-pos s) (sprite-vel s))))
 
-(defun set-sprite-velocity (sprite dir speed)
+(defun set-sprite-velocity (sprite &key dir speed)
   "move a sprite in a direction"
-  (setf (sprite-vel sprite)
-        (vec+ (sprite-vel sprite)
-              (case dir
-                (:right (vec* +right+ speed))
-                (:left (vec* +left+ speed))
-                (:up (vec* +up+ speed))
-                (:down (vec* +down+ speed))))))
+  (if (and dir speed)
+      (setf (sprite-vel sprite)
+            (vec+ (sprite-vel sprite)
+                  (case dir
+                    (:right (vec* +right+ speed))
+                    (:left (vec* +left+ speed))
+                    (:up (vec* +up+ speed))
+                    (:down (vec* +down+ speed)))))
+      (setf (sprite-vel sprite) +origin+)))
 
-(defun maybe-spawn-enemy ()
+(defun maybe-spawn-enemy (state)
   (when (and (< *enemy-count* +max-enemies+)
-             (zerop (mod *current-tick* +enemy-spawn-delay+)))
+             (zerop (mod (tick state) +enemy-spawn-delay+)))
     (let ((s (get-random-from-pool *ufo-pool* *star1-pool*))
           (starting-pos (vec2 (random-side) (random +height+))))
       (when s
         (setf (sprite-pos s) starting-pos
               (sprite-render s) t
               (sprite-vel s) +origin+)
-        (set-sprite-velocity s (if (> (x starting-pos) (/ +width+ 2))
-                                   :left
-                                   :right)
-                             (1+ (random 8)))))))
+        (set-sprite-velocity s :dir (if (> (x starting-pos) (/ +width+ 2))
+                                        :left
+                                        :right)
+                             :speed (1+ (random 8)))))))
 
 (defun maybe-hide-enemies ()
   (loop for s in (append (spritepool-pool *ufo-pool*)
@@ -55,16 +59,15 @@
         for pos = (sprite-pos s)
         
         when (and (sprite-render s)
-                  (or 
-                   (> (x pos) +width+)
-                   (< (x pos) 0)))
+                  (or (> (x pos) +width+)
+                      (< (x pos) 0)))
           do (setf (sprite-render s) nil)))
 
-(defun process ()
+(defun process (state)
 ;  (move-enemies)
   (maybe-hide-enemies)
-  (maybe-spawn-enemy)
-  (process-collision)
+  (maybe-spawn-enemy state)
+  (process-collision state)
 
   (loop for sprite in *sprites*
         when (sprite-render sprite)

@@ -2,17 +2,8 @@
 
 ** Assets
 
-*** Done
-- flame
-- stars
-- ufo
-
-
-*** Planned
-- astronaut 
-- alien
-- meteors
-- backgrounds
+*** Start screen
+    Credit mrpoly for soundtrack ["spaceship.wav"]
 
 ** Code
 
@@ -20,4 +11,5 @@
     would be neat if the player wrapped around the screen
 
 *** Collision 
-    still kinda fucky, not detecting properly
+    collect all sprites that can collide with player
+     compare to player. if (sprite-image) = moon, u win baybee

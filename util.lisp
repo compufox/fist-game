@@ -8,6 +8,18 @@
   (intern (string-upcase thing)
           :keyword))
 
+(defun vecx+ (v1 v2)
+  (+ (x v1) (x v2)))
+
+(defun vecx- (v1 v2)
+  (- (x v1) (x v2)))
+
+(defun vecy+ (v1 v2)
+  (+ (y v1) (y v2)))
+
+(defun vecy- (v1 v2)
+  (- (y v1) (y v2)))
+
 (defmethod vec= ((v1 vec2) (v2 vec2))
   (and (= (x v1) (x v2))
        (= (y v1) (y v2))))
@@ -67,20 +79,33 @@
              collect `(defvar ,(car p) ,(cadr p)))))
 
 (defun sprites-overlap-p (s1 s2)
-  (let ((bb1 (sprite-bounding s1))
-        (bb2 (sprite-bounding s2))
-        (pos1 (sprite-pos s1))
-        (pos2 (sprite-pos s2)))
-    (and (and (>= (x pos1) (x pos2))
-              (<= (+ (x pos1) (x bb1))
-                  (+ (x pos2) (x bb2))))
-         (and (>= (y pos1) (y pos2))
-              (<= (+ (y pos1) (y bb1))
-                  (+ (y pos2) (y bb2)))))))
+  (let* ((bb1 (sprite-bounding s1))
+         (pos1 (sprite-pos s1))
+
+         (sprite1-bottom (y pos1))
+         (sprite1-top (vecy+ pos1 bb1))
+         (sprite1-left (x pos1))
+         (sprite1-right (vecx+ pos1 bb1))
+
+         (sprite2-center (sprite-center-pos s2)))
+    (and (>= (x sprite2-center) sprite1-left)
+         (<= (y sprite2-center) sprite1-top)
+         (<= (x sprite2-center) sprite1-right)
+         (>= (y sprite2-center) sprite1-bottom))))
+         
 
 (defmacro define-fonts (font name &rest forms)
   `(progn
      (gamekit:define-font ,name ,font)
+     (sleep 0.1)
      ,@(loop for f in forms
              collect `(defvar ,(car f)
                         (gamekit:make-font ,name ,(cadr f))))))
+
+(defmacro draw-text (text pos &key (font gamekit::*font*) (color (vec4 0 0 0 1)))
+  `(multiple-value-bind (_ text-width text-height) (gamekit:calc-text-bounds ,text ,font)
+     (declare (ignore _)
+              (ignorable text-height))
+     (gamekit:draw-text ,text (vec2 (- (x ,pos) (/ text-width 2))
+                                   (y ,pos))
+                        :fill-color ,color :font ,font)))
