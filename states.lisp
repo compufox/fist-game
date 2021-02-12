@@ -5,6 +5,7 @@
             :reader options)
    (cutscene-viewed :initform nil
                     :accessor cutscene)
+   (music :initform nil)
    (selected :initform 0
              :accessor selected)))
 
@@ -20,8 +21,15 @@
 
 ;; MENU SCREEN
 (defmethod gamekit:post-initialize ((this menu-state))
+  (unless (and *large-font* *small-font*)
+    (setf *large-font* (gamekit:make-font :krona 50)
+          *small-font* (gamekit:make-font :krona 20)))
   (setf (cutscene this) nil)
-  (with-slots (selected) this
+  (with-slots (selected music) this
+    (unless music
+      (gamekit:play-sound :music :looped-p t)
+      (setf music t))
+    
     (gamekit:bind-button :left :pressed
       (l (setf selected (mod (1- selected) (length (options this))))))
     (gamekit:bind-button :right :pressed

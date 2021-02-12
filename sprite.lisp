@@ -18,16 +18,17 @@
 
 (defun animate-sprite (sprite)
   "helper function that animates a SPRITE every frame"
-  (let ((tick (sprite-tick sprite))
-        (length (sprite-frame-length sprite))
-        (frame (sprite-current-frame sprite))
-        (max-frames (sprite-frames sprite)))
-    (setf (sprite-tick sprite)
-          (mod (1+ tick) length))
-
-    (when (zerop (sprite-tick sprite))
-      (setf (sprite-current-frame sprite)
-            (mod (1+ frame) max-frames)))))
+  (when sprite
+    (let ((tick (sprite-tick sprite))
+          (length (sprite-frame-length sprite))
+          (frame (sprite-current-frame sprite))
+          (max-frames (sprite-frames sprite)))
+      (setf (sprite-tick sprite)
+            (mod (1+ tick) length))
+      
+      (when (zerop (sprite-tick sprite))
+        (setf (sprite-current-frame sprite)
+              (mod (1+ frame) max-frames))))))
 
 (defun create-spritepool (sprite amount)
   "creates a spritepool containing AMOUNT of sprites, using SPRITE as a template"
@@ -62,7 +63,7 @@
         (center (sprite-center s)))
     (vec+ pos center)))
 
-(defmacro define-sprite (path &key name (frames 0) (frame-length 0) frame-size pos center bounding collision-group collide-with render animate collision scale rotation)
+(defmacro define-sprite (sprite-name &key (frames 0) (frame-length 0) frame-size pos center bounding collision-group collide-with render animate collision scale rotation)
   "defines a sprite at PATH, including how many FRAMES, how long each frame should last, how big each sprite is, the sprite's POSition, and CENTER.
 expects a spritesheet that has all sprites aligned along the X axis, and none aligned along the Y axis
 
@@ -72,29 +73,22 @@ SPRITE-SIZE *MUST* be provided.
 FRAMES is determined automatically if not provided.
 RENDER is nil by default. if set to non-nil then the spritesheet will be rendered
 ANIMATE is nil by default. if set to non-nil then the spritesheet will animate"
-  (let ((sprite-name (or name (to-keyword (pathname-name path)))))
-    `(let ((s (make-sprite :image ,sprite-name
-                           :animate ,animate
-                           :render ,render
-                           :frames ,frames
-                           :bounding (or ,bounding ,frame-size +origin+)
-                           :collision ,collision
-                           :scale (or ,scale (vec2 1 1))
-                           :rotation (or ,rotation 0)
-                           :collision-group ,collision-group
-                           :collide-with ,collide-with
-                           :frame-size (or ,frame-size +origin+)
-                           :pos (or ,pos +origin+)
-                           :center (or ,center +origin+)
-                           :frame-length ,frame-length)))
-       (gamekit:define-image ,sprite-name ,path)
-       (sleep 0.1)
-       (unless ,frame-size
-         (setf (sprite-frame-size s)
-               (vec2 (gamekit:image-width ,sprite-name)
-                     (gamekit:image-height ,sprite-name))))
-       (push s *sprites*)
-       s)))
+  `(let ((s (make-sprite :image ,sprite-name
+                         :animate ,animate
+                         :render ,render
+                         :frames ,frames
+                         :bounding (or ,bounding ,frame-size +origin+)
+                         :collision ,collision
+                         :scale (or ,scale (vec2 1 1))
+                         :rotation (or ,rotation 0)
+                         :collision-group ,collision-group
+                         :collide-with ,collide-with
+                         :frame-size (or ,frame-size +origin+)
+                         :pos (or ,pos +origin+)
+                         :center (or ,center +origin+)
+                         :frame-length ,frame-length)))
+     (push s *sprites*)
+     s))
 
 ;; defines how to draw a sprite on the screen
 (defmethod gamekit:draw ((s sprite))
@@ -113,14 +107,15 @@ ANIMATE is nil by default. if set to non-nil then the spritesheet will animate"
                         :height (y size))))
 
 (defun set-sprite-menu-position ()
-  (setf (sprite-pos *moon*) +moon-menu-pos+
-        (sprite-scale *moon*) (vec2 2 2)
-
-        (sprite-pos *fist*) (vec2 (x +fist-menu-pos+) (y +fist-menu-pos+))
-        (sprite-scale *fist*) (vec2 2 2)
-
-        (sprite-pos *flame*) (vec- (vec2 (+ (x +fist-menu-pos+) 5)
-                                         (- (y +fist-menu-pos+)
-                                            (y (sprite-center *fist*))))
-                                   (sprite-center *flame*))
-        (sprite-scale *flame*) (vec2 2 2)))
+  (when (and *moon* *fist* *flame*)
+    (setf (sprite-pos *moon*) +moon-menu-pos+
+          (sprite-scale *moon*) (vec2 2 2)
+          
+          (sprite-pos *fist*) (vec2 (x +fist-menu-pos+) (y +fist-menu-pos+))
+          (sprite-scale *fist*) (vec2 2 2)
+          
+          (sprite-pos *flame*) (vec- (vec2 (+ (x +fist-menu-pos+) 5)
+                                           (- (y +fist-menu-pos+)
+                                              (y (sprite-center *fist*))))
+                                     (sprite-center *flame*))
+          (sprite-scale *flame*) (vec2 2 2))))

@@ -31,3 +31,6 @@
 (defvar *flame* nil)
 (defvar *ufo-pool* nil)
 (defvar *star1-pool* nil)
+(defvar *large-font* nil)
+(defvar *small-font* nil)
+(defvar *game-bg* nil)
