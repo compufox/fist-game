@@ -20,6 +20,7 @@
 
 ;; MENU SCREEN
 (defmethod gamekit:post-initialize ((this menu-state))
+  (setf (cutscene this) nil)
   (with-slots (selected) this
     (gamekit:bind-button :left :pressed
       (l (setf selected (mod (1- selected) (length (options this))))))
@@ -39,16 +40,23 @@
   (setf (sprite-pos *fist*) (vec2 (/ +width+ 2) 0)
         (sprite-scale *fist*) (vec2 1 1)
         (sprite-scale *flame*) (vec2 1 1)
-        (sprite-render *flame*) t
         (sprite-scale *moon*) (vec2 1 1)
-        (sprite-render *moon*) nil
         (sprite-pos *moon*) (vec2 (random +width+) *max-distance*)
         (cutscene this) nil)
   (set-sprite-velocity *fist*))
 
 ;; GAME STATE
 (defmethod gamekit:post-initialize ((this playing-state))
+  
+  ;; cleanup
+  (loop for sprite in *sprites* do (setf (sprite-render sprite) nil))
+  (setf (sprite-render *flame*) t
+        (sprite-render *fist*) t
+        (sprite-render *moon*) t
+        (sprite-vel *moon*) +origin+)
   (set-sprite-velocity *moon* :dir :down :speed *fist-speed*)
+
+  ;; key bindings
   (gamekit:bind-button :right :pressed
     (l (set-sprite-velocity *fist* :dir :right :speed *fist-speed*)))
   (gamekit:bind-button :left :pressed
@@ -75,3 +83,9 @@
                (failed this))
            (gamekit:stop)
            (setf (paused this) (not (paused this)))))))
+
+(defmethod gamekit:pre-destroy ((this playing-state))
+  (setf (sprite-render *flame*) nil
+        (succeeded this) nil
+        (failed this) nil)
+  (set-sprite-menu-position))

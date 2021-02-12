@@ -108,6 +108,9 @@
     (gamekit:draw *moon*))
   (draw-text "ROCKET FIST" (vec2 400 400)
              :color +white+ :font *large-font*)
+  (draw-text "music by mrpoly" (vec2 10 10)
+             :color +white+ :font *small-font*
+             :center nil)
   (loop for opt in (options this)
         for i from 0
         when (= (selected this) i) do

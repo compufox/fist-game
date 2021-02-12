@@ -112,7 +112,6 @@ ANIMATE is nil by default. if set to non-nil then the spritesheet will animate"
                         :width (x size)
                         :height (y size))))
 
-(declaim (inline set-sprite-menu-position))
 (defun set-sprite-menu-position ()
   (setf (sprite-pos *moon*) +moon-menu-pos+
         (sprite-scale *moon*) (vec2 2 2)

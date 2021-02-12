@@ -2,13 +2,7 @@
 
 ** Assets
 
-*** Start screen
-    Credit mrpoly for soundtrack ["spaceship.wav"]
-
 ** Code
-
-*** Player screenwrap
-    would be neat if the player wrapped around the screen
 
 *** Collision 
     collect all sprites that can collide with player

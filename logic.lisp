@@ -24,8 +24,25 @@
                        (setf (failed state) t))))))
 
 (defun move-sprite (s)
-  (setf (sprite-pos s)
-        (vec+ (sprite-pos s) (sprite-vel s))))
+  (if (eql (sprite-image s) :fist)
+      (player-movement-checks s)
+      (setf (sprite-pos s)
+            (vec+ (sprite-pos s) (sprite-vel s)))))
+
+(defun player-movement-checks (p)
+  (let* ((pos (sprite-pos p))
+         (new-pos (vec+ pos (sprite-vel p))))
+    (setf (sprite-pos p)
+          (cond
+            ((> (x new-pos) +width+)
+             (vec2 -36 (y pos)))
+            ((< (x new-pos) -36)
+             (vec2 +width+ (y new-pos)))
+            ((> (y new-pos) +height+)
+             pos)
+            ((< (y new-pos) 0)
+             pos)
+            (t new-pos)))))
 
 (defun set-sprite-velocity (sprite &key dir speed)
   "move a sprite in a direction"
