@@ -9,19 +9,34 @@
   ;;  check if bounding boxes are overlapping with any other sprite
   ;;  
   ;;  if collisions are happening, process them.
-  (let ((sprites (loop for s in *sprites*
-                       when (and (sprite-render s)
-                                 (sprite-collision s))
-                         collect s)))
-    (loop for s1 in sprites
-          do (loop for s2 in sprites
-                   unless (equalp s1 s2) do
-                     (when (and (member (sprite-collision-group s1)
-                                        (sprite-collide-with s2))
-                                (sprites-overlap-p s1 s2))
-                       (unless (failed state)
-                         (gamekit:play-sound :explosion1))
-                       (setf (failed state) t))))))
+  (loop for s1 in (get-rendering-sprites)
+        for colliding = (get-sprites-in-group (sprite-collide-with s1))
+
+        do (loop for s2 in colliding
+                 when (sprites-overlap-p s2 s1)
+                   do (if (or (and (eql (sprite-image s1) :moon)
+                                   (eql (sprite-image s2) :fist))
+                              (and (eql (sprite-image s1) :fist)
+                                   (eql (sprite-image s2) :moon)))
+                          (progn
+                            (unless (succeeded state)
+                              (gamekit:play-sound :explosion2))
+                            (setf (succeeded state) t))
+                          (progn
+                            (unless (failed state)
+                              (gamekit:play-sound :explosion1))
+                            (setf (failed state) t))))))
+
+(defun get-sprites-in-group (collision-group)
+  (loop for s in (get-rendering-sprites)
+        when (member (sprite-collision-group s) collision-group)
+          collect s))
+
+(defun get-rendering-sprites ()
+  (loop for s in *sprites*
+        when (and (sprite-render s)
+                  (sprite-collision s))
+          collect s))
 
 (defun move-sprite (s)
   (if (eql (sprite-image s) :fist)
