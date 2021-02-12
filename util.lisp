@@ -5,8 +5,14 @@
 ;; TODO: substitute _ for -
 (defun to-keyword (thing)
   "convert THING to keyword"
-  (intern (string-upcase thing)
+  (intern (string-upcase (replace-char thing "_" "-"))
           :keyword))
+
+(defun replace-char (s old new)
+  (let ((pos (search old s :test #'string=)))
+    (if pos
+        (replace-char (uiop:strcat (subseq s 0 pos) new (subseq s (1+ pos))) old new)
+        s)))
 
 (defun vecx+ (v1 v2)
   (+ (x v1) (x v2)))

@@ -49,7 +49,9 @@
 (defmethod gamekit:post-initialize ((this playing-state))
   
   ;; cleanup
-  (loop for sprite in *sprites* do (setf (sprite-render sprite) nil))
+  (loop for sprite in *sprites*
+        unless (eql (sprite-image sprite) :game-bg)
+          do (setf (sprite-render sprite) nil))
   (setf (sprite-render *flame*) t
         (sprite-render *fist*) t
         (sprite-render *moon*) t

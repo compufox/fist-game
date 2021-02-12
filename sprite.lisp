@@ -116,7 +116,7 @@ ANIMATE is nil by default. if set to non-nil then the spritesheet will animate"
   (setf (sprite-pos *moon*) +moon-menu-pos+
         (sprite-scale *moon*) (vec2 2 2)
 
-        (sprite-pos *fist*) +fist-menu-pos+
+        (sprite-pos *fist*) (vec2 (x +fist-menu-pos+) (y +fist-menu-pos+))
         (sprite-scale *fist*) (vec2 2 2)
 
         (sprite-pos *flame*) (vec- (vec2 (+ (x +fist-menu-pos+) 5)

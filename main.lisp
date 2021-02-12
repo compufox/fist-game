@@ -39,7 +39,6 @@
 (gamekit:define-image :ufo1 "ufo1.png")
 (gamekit:define-image :star1 "star1.png")
 (gamekit:define-image :menu-bg "start_screen.png")
-;(gamekit:define-image :game-bg "game_bg.png")
 (sleep 0.1)
 
 (setf
@@ -96,6 +95,14 @@
                                  :collision t)
                     15))
 
+(define-sprite "game_bg.png"
+  :frames 2
+  :pos +origin+
+  :frame-size (vec2 800 600)
+  :frame-length 120
+  :animate t
+  :render t)
+
 ;; game state functions
 (defmethod gamekit:draw ((this menu-state))
   (gamekit:draw-image +origin+ :menu-bg)
@@ -138,7 +145,6 @@
     
 
 (defmethod gamekit:draw ((this playing-state))
-  (gamekit:draw-rect +origin+ +width+ +height+ :fill-paint +black+)
 
   ;; after we have "traveled" far enough, render the moon
   (when (< (+ (y (sprite-pos *moon*)) (gamekit:image-height :moon))
