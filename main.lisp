@@ -17,9 +17,8 @@
   (:viewport-title "fist"))
 
 (defmethod gamekit:notice-resources ((this game) &rest resource-names)
-  (when (member :music resource-names)))
-    ;; TODO: uncomment this before shipping
-    ;(gamekit:play-sound :music :looped-p t)))
+  (when (member :music resource-names)
+    (gamekit:play-sound :music :looped-p t)))
 
 (gamekit:start 'game)
 
@@ -33,6 +32,7 @@
 (gamekit:define-sound :explosion1 "explosion1.wav")
 (gamekit:define-sound :explosion2 "explosion2.wav")
 (gamekit:define-sound :music "spaceship.wav")
+(gamekit:define-sound :blastoff "blastoff.wav")
 
 ;;;
 ;; DEFINE SPRITES/IMAGES
@@ -137,6 +137,8 @@
     (set-sprite-menu-position))
   
   (when (cutscene this)
+    (when (= (y (sprite-pos *fist*)) (y +fist-menu-pos+))
+      (gamekit:play-sound :blastoff))
     (incf (y (sprite-pos *fist*)))
     (incf (y (sprite-pos *flame*)))
 
