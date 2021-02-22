@@ -7,11 +7,13 @@ Control a fist! Punch the moon!
 
 install a lisp ([roswell](https://github.com/roswell/roswell))
 
-### Clone the repo
+### Clone the repo and dependencies
 
 ```shell
 $ mkdir ~/common-lisp
 $ git clone https://github.com/compufox/fist-game ~/common-lisp/fist
+$ git clone https://github.com/compufox/trivial-gamekit-timeline ~/common-lisp/
+$ git clone https://github.com/compufox/trivial-gamekit-simple-menus ~/common-lisp/
 ```
 
 ### Set up an extra quicklisp distribution
