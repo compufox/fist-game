@@ -1,9 +1,11 @@
 (in-package :fist)
 
 (defclass menu-state ()
-   ((music :initform nil)
-    (selected :initform 0
-              :accessor selected)))
+  ((menu-timeline :initform nil
+                  :accessor menu-timeline)
+   (music :initform nil)
+   (selected :initform 0
+             :accessor selected)))
 
 (defclass playing-state ()
   ((paused :initform nil
@@ -24,22 +26,31 @@
     (setf *start-menu*
           (make-menu "ROCKET FIST" nil
                      #'menu-callback
-                     ;:position (vec2 400 800)
+                     :position (vec2 400 600)
                      :heading-font *large-font*
                      :option-font *small-font*
                      :fill-color +white+))
-    (initialize-menu *start-menu*))
+    
+    ;; define keyframes for our menu
+    (make-keyframe *menu-timeline* 0
+                   :object *start-menu* :slot 'gamekit.simple-menus::position
+                   :target (vec2 400 600)
+                   :event (l (setf (menu-options *start-menu*) nil)))
+    (make-keyframe *menu-timeline* 45
+                   :object *start-menu* :slot 'gamekit.simple-menus::position
+                   :target (vec2 400 400)
+                   :event (l (setf (menu-options *start-menu*)
+                                   '(("Start" . :start)
+                                     ("Quit" . :quit)))))
+    (play-timeline *menu-timeline*))
+  (initialize-menu *start-menu*)
   
   (with-slots (music) this
     (unless music
       (gamekit:play-sound :music :looped-p t)
       (setf music t)))
   (when (and *moon* *fist* *flame*)
-    (set-sprite-menu-position))
-
-  (when *start-menu*
-    (restart-timeline *menu-timeline*)
-    (play-timeline *menu-timeline*)))
+    (set-sprite-menu-position)))
 
 (defmethod gamekit:pre-destroy ((this menu-state))
   (setf (sprite-pos *fist*) (vec2 (/ +width+ 2) 0)

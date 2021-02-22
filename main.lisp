@@ -113,22 +113,12 @@
                :target (vec2 275 304)
                :event (l (gamekit.fistmachine:transition-to 'playing-state)))
 
-;; define keyframes for our menu
-(make-keyframe *menu-timeline* 0
-               :object *start-menu* :slot 'position
-               :target (vec2 400 600)
-               :event (l (setf (menu-options *start-menu*) nil)))
-(make-keyframe *menu-timeline* 45
-               :object *start-menu* :slot 'position
-               :target (vec2 400 400)
-               :event (l (setf (menu-options *start-menu*)
-                               '(("Start" . :start)
-                                 ("Quit" . :quit)))))
-
 ;; our callback for our start menu
 (defun menu-callback (selected)
   (case selected
-    (:start (play-timeline *start-timeline*))
+    (:start (progn
+              (restart-timeline *start-timeline*)
+              (play-timeline *start-timeline*)))
     (:quit (gamekit:stop))))
 
 ;; game state functions
