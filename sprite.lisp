@@ -1,16 +1,42 @@
 (in-package :fist)
 
 ;; define SPRITE struct
-(defstruct sprite
-  (tick 0)
-  (current-frame 0)
-  (vel +origin+)
-  (rotation 0)
-  (scale (vec2 1 1))
-  image frames frame-size animate
-  frame-length pos center render 
-  bounding collision-group collide-with
-  collision)
+(defclass sprite ()
+  ((tick :initform 0 :initarg :tick
+         :accessor sprite-tick)
+   (current-frame :initform 0 :initarg :current-frame
+                  :accessor sprite-current-frame)
+   (vel :initform +origin+
+        :accessor sprite-vel)
+   (rotation :initform 0 :initarg :rotation
+             :accessor sprite-rotation)
+   (scale :initform (vec2 1 1)
+          :initarg :scale
+          :accessor sprite-scale)
+   (image :initarg :image
+          :accessor sprite-image)
+   (frames :initarg :frames
+           :accessor sprite-frames)
+   (frame-size :initarg :frame-size
+               :accessor sprite-frame-size)
+   (animate :initarg :animate :initform nil
+            :accessor sprite-animate)
+   (frame-length :initarg :frame-length
+                 :accessor sprite-frame-length)
+   (pos :initarg :pos :initform +origin+
+        :accessor sprite-pos)
+   (center :initarg :center
+           :accessor sprite-center)
+   (render :initarg :render :initform nil
+           :accessor sprite-render)
+   (bounding :initarg :bounding
+             :accessor sprite-bounding)
+   (collision-group :initarg :collision-group
+                    :accessor sprite-collision-group)
+   (collide-with :initarg :collide-with
+                 :accessor sprite-collide-with)
+   (collision :initarg :collision
+              :accessor sprite-collision)))
 
 ;; define sprite pool struct
 (defstruct spritepool
@@ -34,7 +60,7 @@
   "creates a spritepool containing AMOUNT of sprites, using SPRITE as a template"
   (let ((p (make-spritepool :sprite sprite :amount amount :pool nil)))
     (dotimes (i amount)
-      (let ((s (make-sprite :image (sprite-image sprite)
+      (let ((s (make-instance 'sprite :image (sprite-image sprite)
                             :frames (sprite-frames sprite)
                             :frame-size (sprite-frame-size sprite)
                             :frame-length (sprite-frame-length sprite)
@@ -73,20 +99,21 @@ SPRITE-SIZE *MUST* be provided.
 FRAMES is determined automatically if not provided.
 RENDER is nil by default. if set to non-nil then the spritesheet will be rendered
 ANIMATE is nil by default. if set to non-nil then the spritesheet will animate"
-  `(let ((s (make-sprite :image ,sprite-name
-                         :animate ,animate
-                         :render ,render
-                         :frames ,frames
-                         :bounding (or ,bounding ,frame-size +origin+)
-                         :collision ,collision
-                         :scale (or ,scale (vec2 1 1))
-                         :rotation (or ,rotation 0)
-                         :collision-group ,collision-group
-                         :collide-with ,collide-with
-                         :frame-size (or ,frame-size +origin+)
-                         :pos (or ,pos +origin+)
-                         :center (or ,center +origin+)
-                         :frame-length ,frame-length)))
+  `(let ((s (make-instance 'sprite
+                           :image ,sprite-name
+                           :animate ,animate
+                           :render ,render
+                           :frames ,frames
+                           :bounding (or ,bounding ,frame-size +origin+)
+                           :collision ,collision
+                           :scale (or ,scale (vec2 1 1))
+                           :rotation (or ,rotation 0)
+                           :collision-group ,collision-group
+                           :collide-with ,collide-with
+                           :frame-size (or ,frame-size +origin+)
+                           :pos (or ,pos +origin+)
+                           :center (or ,center +origin+)
+                           :frame-length ,frame-length)))
      (push s *sprites*)
      s))
 

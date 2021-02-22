@@ -1,13 +1,9 @@
 (in-package :fist)
 
 (defclass menu-state ()
-  ((options :initform '("Start" "Quit")
-            :reader options)
-   (cutscene-viewed :initform nil
-                    :accessor cutscene)
-   (music :initform nil)
-   (selected :initform 0
-             :accessor selected)))
+   ((music :initform nil)
+    (selected :initform 0
+              :accessor selected)))
 
 (defclass playing-state ()
   ((paused :initform nil
@@ -24,33 +20,33 @@
   (unless (and *large-font* *small-font*)
     (setf *large-font* (gamekit:make-font :krona 50)
           *small-font* (gamekit:make-font :krona 20)))
-  (setf (cutscene this) nil)
-  (with-slots (selected music) this
+  (unless *start-menu*
+    (setf *start-menu*
+          (make-menu "ROCKET FIST" nil
+                     #'menu-callback
+                     ;:position (vec2 400 800)
+                     :heading-font *large-font*
+                     :option-font *small-font*
+                     :fill-color +white+))
+    (initialize-menu *start-menu*))
+  
+  (with-slots (music) this
     (unless music
       (gamekit:play-sound :music :looped-p t)
-      (setf music t))
-    
-    (gamekit:bind-button :left :pressed
-      (l (setf selected (mod (1- selected) (length (options this))))))
-    (gamekit:bind-button :right :pressed
-      (l (setf selected (mod (1+ selected) (length (options this))))))
-    (gamekit:bind-button :enter :pressed
-      (l (case selected
-           ;; for state 0 i want to do a little cutscene,
-           ;;  before transitioning
-           (0 (setf (cutscene this) t))
-           (1 (gamekit:stop))
-           (t (gamekit:stop))))))
+      (setf music t)))
   (when (and *moon* *fist* *flame*)
-    (set-sprite-menu-position)))
+    (set-sprite-menu-position))
+
+  (when *start-menu*
+    (restart-timeline *menu-timeline*)
+    (play-timeline *menu-timeline*)))
 
 (defmethod gamekit:pre-destroy ((this menu-state))
   (setf (sprite-pos *fist*) (vec2 (/ +width+ 2) 0)
         (sprite-scale *fist*) (vec2 1 1)
         (sprite-scale *flame*) (vec2 1 1)
         (sprite-scale *moon*) (vec2 1 1)
-        (sprite-pos *moon*) (vec2 (random +width+) *max-distance*)
-        (cutscene this) nil)
+        (sprite-pos *moon*) (vec2 (random +width+) *max-distance*))
   (set-sprite-velocity *fist*))
 
 ;; GAME STATE

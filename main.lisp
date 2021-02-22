@@ -66,7 +66,7 @@
           :render nil
           :collision t)
  *ufo-pool*
- (create-spritepool (make-sprite :image :ufo1
+ (create-spritepool (make-instance 'sprite :image :ufo1
                                  :current-frame 0
                                  :frames 2
                                  :frame-size (vec2 40 20)
@@ -79,7 +79,7 @@
                                  :collision t)
                     15)
  *star1-pool*
- (create-spritepool (make-sprite :image :star1
+ (create-spritepool (make-instance 'sprite :image :star1
                                  :current-frame 0
                                  :frames 2
                                  :frame-size (vec2 20 20)
@@ -100,10 +100,41 @@
       :animate t
       :render t)
 
+;; define keyframes for our start screen sprites
+(make-keyframe *start-timeline* 0
+               :event (l (uninitialize-menu *start-menu*)
+                         (setf (sprite-render *flame*) t)
+                         (gamekit:play-sound :blastoff)))
+(make-keyframe *start-timeline* 120
+               :object *fist* :slot 'pos
+               :target (vec2 280 350))
+(make-keyframe *start-timeline* 120
+               :object *flame* :slot 'pos
+               :target (vec2 275 304)
+               :event (l (gamekit.fistmachine:transition-to 'playing-state)))
+
+;; define keyframes for our menu
+(make-keyframe *menu-timeline* 0
+               :object *start-menu* :slot 'position
+               :target (vec2 400 600)
+               :event (l (setf (menu-options *start-menu*) nil)))
+(make-keyframe *menu-timeline* 45
+               :object *start-menu* :slot 'position
+               :target (vec2 400 400)
+               :event (l (setf (menu-options *start-menu*)
+                               '(("Start" . :start)
+                                 ("Quit" . :quit)))))
+
+;; our callback for our start menu
+(defun menu-callback (selected)
+  (case selected
+    (:start (play-timeline *start-timeline*))
+    (:quit (gamekit:stop))))
+
 ;; game state functions
 (defmethod gamekit:draw ((this menu-state))
   (gamekit:draw-image +origin+ :menu-bg)
-  (when (cutscene this)
+  (when (sprite-render *flame*)
     (gamekit:with-pushed-canvas ()
       (gamekit:draw *flame*)))
   (gamekit:with-pushed-canvas ()
@@ -111,39 +142,15 @@
   (gamekit:with-pushed-canvas ()
     (gamekit:draw *moon*))
 
-  (when (and *large-font* *small-font*)
-    (draw-text "ROCKET FIST" (vec2 400 400)
-               :color +white+ :font *large-font*)
+  (when (and *start-menu* *small-font*)
     (draw-text "music by mrpoly" (vec2 10 10)
                :color +white+ :font *small-font*
                :center nil)
-    (loop for opt in (options this)
-          for i from 0
-          when (= (selected this) i) do
-            (draw-text ">" (vec2 (+ 310 (* text-width i) (* i 90))
-                                 350)
-                       :color +white+ :font *small-font*)
-            
-          do (draw-text opt
-                        (vec2 (+ 350 (* text-width i) (* i 50))
-                              350)
-                        :color +white+ :font *small-font*))))
+    (draw-menu *start-menu*)))
                       
 (defmethod gamekit:act ((this menu-state))
   ;; ensure sprite size and location on menu screen
-  (animate-sprite *flame*)
-  (unless (cutscene this)
-    (set-sprite-menu-position))
-  
-  (when (cutscene this)
-    (when (= (y (sprite-pos *fist*)) (y +fist-menu-pos+))
-      (gamekit:play-sound :blastoff))
-    (incf (y (sprite-pos *fist*)))
-    (incf (y (sprite-pos *flame*)))
-
-    (when (> (y (sprite-pos *flame*)) (/ +height+ 2))
-      (gamekit.fistmachine:transition-to 'playing-state))))
-    
+  (animate-sprite *flame*))
 
 (defmethod gamekit:draw ((this playing-state))
 

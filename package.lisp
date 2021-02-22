@@ -1,7 +1,7 @@
 ;;;; package.lisp
 
 (defpackage #:fist
-  (:use #:cl)
+  (:use #:cl #:gamekit.timeline #:gamekit.simple-menus)
   (:import-from :alexandria
                 :define-constant)
   (:import-from :trivial-gamekit

@@ -34,3 +34,6 @@
 (defvar *large-font* nil)
 (defvar *small-font* nil)
 (defvar *game-bg* nil)
+(defvar *start-menu* nil)
+(defvar *menu-timeline* (make-timeline))
+(defvar *start-timeline* (make-timeline))

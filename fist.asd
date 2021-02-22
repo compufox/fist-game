@@ -6,7 +6,8 @@
   :license  "Specify license here"
   :version "0.0.1"
   :serial t
-  :depends-on (#:trivial-gamekit #:trivial-gamekit-fistmachine)
+  :depends-on (#:trivial-gamekit #:trivial-gamekit-fistmachine
+               #:trivial-gamekit-timeline #:trivial-gamekit-simple-menus)
   :components ((:file "package")
                (:file "util")
                (:file "vars")
